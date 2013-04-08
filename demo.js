@@ -1,0 +1,1 @@
+aws_js_sdk.foo();
