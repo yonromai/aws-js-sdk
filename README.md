@@ -1,4 +1,4 @@
 aws-js-sdk
 ==========
 
-Helper library to talk to AWS client side
+Do not use this code: Not secure, not complete... a pure piece of crap!
