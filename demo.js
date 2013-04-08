@@ -3,7 +3,7 @@ var AWSAccessKeyId = "AKIAIOSFODNN7EXAMPLE",
     query_params = {
       http_verb: "GET",
       date:"Tue, 27 Mar 2007 19:36:42 +0000",
-      bucket:"johnsmith",
+      bucket:"johnsmithéé",
       ressource_path:"/photos/puppy.jpg"
     };
 

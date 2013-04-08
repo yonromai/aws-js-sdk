@@ -16,14 +16,13 @@
 // CanonicalizedAmzHeaders = <described below>
 
 var get_string_to_sign =  function(params){ // to refactor
-  return params.http_verb + "\n\n\n" + params.date + '\n' + (params.bucket ? "/" + params.bucket : "") + params.ressource_path + '\n';
+  return params.http_verb + "\n\n\n" + params.date + '\n' + (params.bucket ? "/" + params.bucket : "") + params.ressource_path;
 };
 
 var get_authorization_header = function(AWSAccessKeyId, YourSecretAccessKeyID, query_params){
   var string_to_sign = get_string_to_sign(query_params);
-  console.log(string_to_sign);
   var signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA1( 
-    CryptoJS.enc.Utf8.stringify(string_to_sign),
+    CryptoJS.enc.Utf8.parse(string_to_sign),
     YourSecretAccessKeyID));
   return "AWS" + " " + AWSAccessKeyId + ":" + signature;
 };
