@@ -28,10 +28,10 @@ query_params = {
   ressource_path:"/"
 };
 
-console.log(my_s3.get_http_headers(bucket, path));
+// console.log(my_s3.get_http_headers(bucket, path));
 
-var tmpAWSAccessKeyId = "fooid";
-var tmpYourSecretAccessKeyID = "fooSecret";
+var tmpAWSAccessKeyId = "myAccessKey";
+var tmpYourSecretAccessKeyID = "mySecretKey";
 var bucket = "hpc.bucket.demo";
 var path = "/demo/demo_file";
 

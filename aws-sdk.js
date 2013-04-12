@@ -28,11 +28,12 @@ var get_http_headers = function(AWSAccessKeyId, YourSecretAccessKeyID, bucket, p
 };
 
 var get_string_to_sign =  function(params){ // to refactor
-  return params.http_verb + "\n\n\n" + params.date + '\n' + (params.bucket ? "/" + params.bucket : "") + params.ressource_path;
+  return params.http_verb + "\n\n\n" + "\nx-amz-date:" + params.date + '\n' + (params.bucket ? "/" + params.bucket : "") + params.ressource_path;
 };
 
 var get_authorization_header = function(AWSAccessKeyId, YourSecretAccessKeyID, query_params){
   var string_to_sign = get_string_to_sign(query_params);
+  console.log(string_to_sign);
   var signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA1( 
     CryptoJS.enc.Utf8.parse(string_to_sign),
     YourSecretAccessKeyID));
