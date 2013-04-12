@@ -30,9 +30,9 @@ query_params = {
 
 // console.log(my_s3.get_http_headers(bucket, path));
 
-var tmpAWSAccessKeyId = "AKIAIJ7G277HYO3TFTHQ"; // "ASIAIMI36F53QZGB6QRA";
-var tmpYourSecretAccessKeyID = "q2Cdub7sFjLMqwJIeYwSOzzwu83/5UyXtbvpoBte" ; // "KJbt6XpPe01FZWPZL0wXhlV9hXuSKrtR0XJglydP";
-var token = "AQoDYXdzEI///////////wEaoAJnM+J/s24XzZ8Lx4pjHbQaQQl+lXzYnWbkrjYu9Ty4kq9tRc4Ab4+GCAspJjKwmPu/bvgeZr0EQWrDUM5hhJd67ah5X32c9/qFbAd3smWJEA0dTajhrCBR/mYRknFr8qsvVy8W+BqmvZPFB/WGJy6rwDvtc/fEkduG7zC5mq5bZ9EbpxK7i+q03vBmgQw29ACSsYCSz7gEdZLbgYkbia0fqSND87vm0RPnQt+qo0/yeNZXDxhDTchnYMdh3gVUMCb82Cr/mdoArxm/ncpOcOweOrk23Zw02doJ/12S/s41zJqbrkHggXpIkSYccl0/h2BAANqUqw+f8R7N0R+kftjPGtWoX2wU4gZYap6biLrQuesRbfIoobEVg1O7LyvLIU4g052giwU=";
+var tmpAWSAccessKeyId = "accesskey";
+var tmpYourSecretAccessKeyID = "secretkey";
+var tokenAmzHeader = {"x-amz-security-token" : "AQoDYXdzEI///////////wEaoAJnM+J/s24XzZ8Lx4pjHbQaQQl+lXzYnWbkrjYu9Ty4kq9tRc4Ab4+GCAspJjKwmPu/bvgeZr0EQWrDUM5hhJd67ah5X32c9/qFbAd3smWJEA0dTajhrCBR/mYRknFr8qsvVy8W+BqmvZPFB/WGJy6rwDvtc/fEkduG7zC5mq5bZ9EbpxK7i+q03vBmgQw29ACSsYCSz7gEdZLbgYkbia0fqSND87vm0RPnQt+qo0/yeNZXDxhDTchnYMdh3gVUMCb82Cr/mdoArxm/ncpOcOweOrk23Zw02doJ/12S/s41zJqbrkHggXpIkSYccl0/h2BAANqUqw+f8R7N0R+kftjPGtWoX2wU4gZYap6biLrQuesRbfIoobEVg1O7LyvLIU4g052giwU="};
 var bucket = "hpc.bucket.demo";
 var path = "/demo/demo_file";
 
