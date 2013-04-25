@@ -1,7 +1,7 @@
 
 if (process.argv.length < 4) {
 	// console.log('Usage: node demo_credentials.js [akid] [secret] [bucket] [file_key]');
-	console.log('Usage: node demo_credentials.js [user] [policy] [folder]');
+	console.log('Usage: node demo_s3.js [user] [policy] [folder]');
 	process.exit();
 }
 
