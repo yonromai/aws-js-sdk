@@ -1,6 +1,5 @@
 aws_api = {
 	handle : require('aws-sdk'),
-	policyFile : "./policy.json",
 	akid : process.env.SWS_AKID,
 	secret : process.env.SWS_SECRET,
 	token : "",
@@ -29,15 +28,15 @@ aws_api = {
 	
 	getClientToken : function (params, callback) {
 		this.update({region: 'us-east-1'});
-    	var svc = new this.handle.STS();
+    var svc = new this.handle.STS();
 		var fs = require('fs');
-
-		fs.readFile(this.policyFile, 'utf8', function(err, data) {
+		var policyFile = params['Policy'] == 'AllS3' ? "./allS3.json" : "./clientFolder.json";
+		fs.readFile(policyFile, 'utf8', function(err, data) {
 			if (err) {
 				console.log('Error while reading the policy file: ' + err);
 			} else {
 				console.log(data);
-				params['Policy'] = data[params['Policy']];
+				params['Policy'] = data;
 				console.log(params);
 				
 				svc.client.getFederationToken(params, function(err, data) {

@@ -1,0 +1,7 @@
+{
+	"Statement":[{
+		"Action":["s3:GetObject"],
+		"Effect":"Allow",
+		"Resource":"*"
+	}]
+}
