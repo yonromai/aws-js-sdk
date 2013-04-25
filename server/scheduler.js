@@ -17,7 +17,8 @@ var split_matrix = function(){
     var buf = new Buffer(8 * vec_chunks[i].size);
     for (var j = 0; j < vec_chunks[i].size; ++j)
       buf.writeDoubleLE(vec.get([i*m_chunk_size + j + 1,1]), j*8);
-    // TODO: put the buffer in s3
+    vec_chunks[i].path = "input/vec/chunk_" + i;
+    // TODO: put the buffer in s3 (crap like s3.put(buf, vec_chunks[i].path) ... but async :P)
     if (vec_cnt <= 0) break; // all the vec has been buffered
   }
 
@@ -27,6 +28,7 @@ var split_matrix = function(){
     mat_chunks.push([]);
     for (var j = 0; j < math.ceil(m/m_chunk_size); ++j){
       mat_chunks[i].push({});
+      mat_chunks[i][j].path = "input/mat/chunk_" + i + "_" + j;
       mat_chunks[i][j].size_n = math.min(n_chunk_size, n - i*n_chunk_size);
       mat_chunks[i][j].size_m = math.min(m_chunk_size, m - j*m_chunk_size);
       mat_chunks[i][j].related_vec_chunk = j;
@@ -39,6 +41,27 @@ var split_matrix = function(){
       // TODO: put the buffer in s3
     }
   }
+
+  // Posting the job messages on the queue
+  for(var i = 0; i < mat_chunks.length; ++i)
+    for(var j = 0; j < mat_chunks[i].length; ++j){
+      var s3_msg_id = require("./guid_helper").guid();
+      var job_msg_id = require("./guid_helper").guid();
+      var s3_msg = {
+        "completed_job_id": job_msg_id
+      };
+      // TODO: post s3_msg on S3
+      var job_msg = {
+        "job_info" : {
+          "job_id": job_msg_id,
+          "type": 42, // matrix-vector (chunk) multiply
+          "parameters": {"n": mat_chunks[i][j].size_n, "m": mat_chunks[i][j].size_m},
+          "next_job_id": s3_msg_id
+        },
+        "input_blob": [mat_chunks[i][j].path, vec_chunks[mat_chunks[i][j].related_vec_chunk].path]
+      };
+      // TODO: Post the message on the queue
+    }
 }
 
 var main = function(){
