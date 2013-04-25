@@ -5,7 +5,7 @@ var get_http_headers = function(AWSAccessKeyId, YourSecretAccessKeyID, tokenAmzH
   headers.Authorization = get_authorization_header(AWSAccessKeyId, YourSecretAccessKeyID, {
     http_verb: "GET",
     date: headers.Date,
-		amzHeaders: [(tokenAmzHeader ? "x-amz-security-token:" + tokenAmzHeader["x-amz-security-token"] : null)],
+		amzHeaders: tokenAmzHeader,
     bucket: bucket,
     ressource_path: path
   });
@@ -25,8 +25,10 @@ var get_string_to_sign =  function(params){ // to refactor
   var CanonicalizedAmzHeaders = "";
   // amzHeaders should be an array of header:value strings (or as a CSList)
   if(params.amzHeaders && params.amzHeaders.lenght > 0){
-    params.amzHeaders.sort();
+    var headers = [];
     for(var header in params.amzHeaders)
+      headers.append(header + ":" + params.amzHeaders[header]);
+    for(var header in  headers.sort())
       CanonicalizedAmzHeaders += header + "\n";
   }
 
@@ -34,8 +36,8 @@ var get_string_to_sign =  function(params){ // to refactor
   var string_to_sign = "";
   string_to_sign += params.http_verb + "\n";
   string_to_sign += (params.content ? CryptoJS.MD5(params.content): "") + "\n";
-  string_to_sign += params.content_type + "\n";
-  string_to_sign += params.date + '\n';
+  string_to_sign += (params.content_type? params.content_type : "") + "\n";
+  string_to_sign += (params.date? params.date : "") + '\n';
   string_to_sign += CanonicalizedResource;
   string_to_sign += CanonicalizedAmzHeaders;
 
