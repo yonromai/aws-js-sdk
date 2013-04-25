@@ -22,10 +22,19 @@ aws_api = {
 			callback(err, data);
 		});
 	},
+
+	putObject : function(params, callback) {
+		this.update({region : 'us-east-1'});
+		var s3 = new this.handle.S3();
+
+		s3.client.putObject(params, function(err, data) {
+			callback(err, data);
+		});
+	},
 	
 	getClientToken : function (params, callback) {
 		this.update({region: 'us-east-1'});
-    var svc = new this.handle.STS();
+    	var svc = new this.handle.STS();
 		
 		svc.client.getFederationToken(params, function(err, data) {
 			callback(err, data);
