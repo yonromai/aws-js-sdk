@@ -4,17 +4,14 @@ aws_api = {
 	secret : process.env.SWS_SECRET,
 	token : "",
 	region : 'us-west-2',
-
+	policyFiles : { AllS3: "./allS3.json", ClientFolder: "./clientFolder.json" },
+	
 	update : function(params) {
 		this.akid = params['AccessKeyId']? params['akid'] : this.akid;
  		this.secret = params['SecretAccessKey']? params['secret'] : this.secret;
 		this.region = params['region']? params['region'] : this.region;
 		this.token = params['SessionToken']? params['SessionToken'] : this.token;
 		this.handle.config.update({ accessKeyId: this.akid , secretAccessKey: this.secret, sessionToken: this.token, region: this.region });
-	},
-	
-	getCredentials : function() {
-		return this.handle.credentials();
 	},
 	
 	getObject : function (params, callback) {
@@ -29,21 +26,32 @@ aws_api = {
 	getClientToken : function (params, callback) {
 		this.update({region: 'us-east-1'});
     var svc = new this.handle.STS();
+		
+		svc.client.getFederationToken(params, function(err, data) {
+			callback(err, data);
+		});
+	},
+
+	getPolicy : function(params, callback) {
 		var fs = require('fs');
-		var policyFile = params['Policy'] == 'AllS3' ? "./allS3.json" : "./clientFolder.json";
-		fs.readFile(policyFile, 'utf8', function(err, data) {
+		
+		fs.readFile(this.policyFiles[params['Policy']], 'utf8', function(err, data) {
 			if (err) {
 				console.log('Error while reading the policy file: ' + err);
 			} else {
-				console.log(data);
-				params['Policy'] = data;
-				console.log(params);
-				svc.client.getFederationToken(params, function(err, data) {
-					callback(err, data);
-				});
+				var policy = data;
+				if (params['Policy'] == 'ClientFolder') {
+					var json = JSON.parse(policy);
+					json['Statement'][0]['Resource'] = params['Folder'];
+					policy = JSON.stringify(json);
+				}
+				delete params['Folder'];
+				params['Policy'] = policy;
+				callback(params);
 			}
 		});
 	},
+
 
 	addUserToGroup : function (groupName, userName, callback) {
 		this.update({region : 'us-east-1'});
