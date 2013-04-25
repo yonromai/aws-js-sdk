@@ -38,7 +38,7 @@ var tokenCallback = function(err, data) {
 		console.log(data);
 
 		aws_api.update(data['Credentials']);
-		
+		console.log(aws_api.getCredentials());
 		// aws_api.getObject({ Bucket: bucket, Key: key }, simpleCallback);
 		 
 		// aws_api.addUserToGroup('hpc.group.clients', 'third_client',  addUserCallback);

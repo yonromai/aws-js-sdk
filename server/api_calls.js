@@ -38,7 +38,6 @@ aws_api = {
 				console.log(data);
 				params['Policy'] = data;
 				console.log(params);
-				
 				svc.client.getFederationToken(params, function(err, data) {
 					callback(err, data);
 				});
