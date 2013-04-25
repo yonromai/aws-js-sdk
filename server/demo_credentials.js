@@ -1,7 +1,7 @@
 
 if (process.argv.length < 4) {
 	// console.log('Usage: node demo_credentials.js [akid] [secret] [bucket] [file_key]');
-	console.log('Usage: node demo_credentials.js [user] [policy_file]');
+	console.log('Usage: node demo_credentials.js [user] [policy]');
 	process.exit();
 }
 
@@ -14,7 +14,7 @@ var key = process.argv[5];
 */
 
 var userName = process.argv[2];
-var policyFile = process.argv[3];
+var policy = process.argv[3];
 
 var simpleCallback = function(err, data) {
 	if (err) {
@@ -31,26 +31,21 @@ var simpleCallback = function(err, data) {
 // aws_api.addUserToGroup(groupName, userName);
 
 var tokenCallback = function(err, data) {
-	var addUserCallback = function(err, data) {
-		if (err) {
-			console.log(err);
-		} else {
-			console.log(data);
-		}
-	}
-	
 	if (err) {
 		console.log(err);
 	} else {
 		console.log('Success!');
 		console.log(data);
-		//var credentials = data['Credentials'];
-		//aws_api.update({ akid: credentials['SecretAccessKey'], secret: credentials['AccessKeyId'] });
-		//aws_api.addUserToGroup('hpc.group.clients', 'third_client',  addUserCallback);
+
+		aws_api.update(data['Credentials']);
+		
+		// aws_api.getObject({ Bucket: bucket, Key: key }, simpleCallback);
+		 
+		// aws_api.addUserToGroup('hpc.group.clients', 'third_client',  addUserCallback);
 	}
 }
 
-aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: policyFile}, tokenCallback);
+aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: policy}, tokenCallback);
 
 /* var AWS = require('aws-sdk');
 var groupName = process.argv[2];

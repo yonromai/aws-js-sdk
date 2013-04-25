@@ -1,18 +1,50 @@
 aws_api = {
+	policyFile : "./policy.json"
 	handle : require('aws-sdk'),
 	akid : process.env.SWS_AKID,
 	secret : process.env.SWS_SECRET,
+	token : "",
 	region : 'us-west-2',
 
 	update : function(params) {
-		this.akid = params['akid']? params['akid'] : this.akid;
- 		this.secret = params['secret']? params['secret'] : this.secret;
+		this.akid = params['AccessKeyId']? params['akid'] : this.akid;
+ 		this.secret = params['SecretAccessKey']? params['secret'] : this.secret;
 		this.region = params['region']? params['region'] : this.region;
-		
-		this.handle.config.update({ accessKeyId: this.akid , secretAccessKey: this.secret });
-		this.handle.config.update({region: this.region});
+		this.token = params['SessionToken']? params['SessionToken'] : this.token;
+		this.handle.config.update({ accessKeyId: this.akid , secretAccessKey: this.secret, sessionToken: this.token, region: this.region });
 	},
 	
+	getCredentials : function() {
+		return this.handle.credentials();
+	},
+	
+	getObject : function (params, callback) {
+		this.update({region : 'us-west-1'});
+		var s3 = new this.handle.S3();
+		
+		s3.client.getObject(params, function(err, data) {
+			callback(err, data);
+		});
+	},
+	
+	getClientToken : function (params, callback) {
+		this.update({region: 'us-east-1'});
+    	var svc = new this.handle.STS();
+		var fs = require('fs');
+
+		fs.readFile(this.policyFile, 'utf8', function(err, data) {
+			if (err) {
+				console.log('Error while reading the policy file: ' + err);
+			} else {
+				params['Policy'] = data[params['Policy']];
+				console.log(params);
+				
+				svc.client.getFederationToken(params, function(err, data) {
+					callback(err, data);
+				});
+			}
+		});
+	},
 	
 	addUserToGroup : function (groupName, userName, callback) {
 		this.update({region : 'us-east-1'});
@@ -52,35 +84,6 @@ aws_api = {
 					callback(err, data);
 				});
 			});
-		});
-	},
-	
-	getObject : function (params, callback) {
-		this.update({region : 'us-west-1'});
-		var s3 = new this.handle.S3();
-		
-		s3.client.getObject(params, function(err, data) {
-			callback(err, data);
-		});
-	},
-	
-	getClientToken : function (params, callback) {
-		this.update({region: 'us-east-1'});
-    var svc = new this.handle.STS();
-		var fs = require('fs');
-
-		fs.readFile(params['Policy'], 'utf8', function(err, data) {
-			if (err) {
-				console.log('Error while reading the policy file: ' + err);
-			} else {
-				console.log(data);
-				params['Policy'] = data;
-				console.log(params);
-				
-				svc.client.getFederationToken(params, function(err, data) {
-					callback(err, data);
-				});
-			}
 		});
 	}
 }

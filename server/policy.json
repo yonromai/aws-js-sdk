@@ -1,8 +1,17 @@
 {
-	"Statement":[{
-		"Action":["s3:Get*","s3:List*"],
-		"Effect":"Allow",
-		"Resource":"*"
-	}]
+	"AllS3": {
+		"Statement":[{
+			"Action":["s3:GetObject"],
+			"Effect":"Allow",
+			"Resource":"*"
+		}]
+	},
+	"Folder": {
+		"Statement":[{
+			"Action":["s3:GetObject, s3:PutObject"],
+			"Effect":"Allow",
+			"Resource":"FOLDER"
+		}]
+	}
 }
 
