@@ -1,5 +1,0 @@
-node --debug-brk [script.js]
-node-inspector &
-
-open http://54.245.187.156:8080/debug?port=5858 in a browser (issues in firefox)
-more details: https://github.com/dannycoates/node-inspector
