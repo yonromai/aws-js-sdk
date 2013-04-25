@@ -1,31 +1,31 @@
 
 if (process.argv.length < 4) {
 	// console.log('Usage: node demo_credentials.js [akid] [secret] [bucket] [file_key]');
-	console.log('Usage: node demo_sqs.js [user] [policy] [folder]');
+	console.log('Usage: node demo_sqs.js [user] [queue]');
 	process.exit();
 }
 
 require('./api_calls.js');
 
 var userName = process.argv[2];
-var policy = process.argv[3];
-var folder = (policy == 'ClientFolder') ? process.argv[4] : "";
+queue = process.argv[3];
 
-var getCallback = function(err, data) {
-	if (err) {
-		console.log(err);
-	} else {
-		console.log('Success!');
-		console.log(data['Body'].toString());
-	}
-}
-
-var putCallback = function(err, data) {
+var popCallback = function(err, data) {
 	if (err) {
 		console.log(err);
 	} else {
 		console.log('Success!');
 		console.log(data);
+	}
+}
+
+var pushCallback = function(err, data) {
+	if (err) {
+		console.log(err);
+	} else {
+		console.log('Success!');
+		console.log(data);
+		aws_api.popMessage({ QueueUrl: queue, MaxNumberOfMessages: 1 }, pushCallback);
 	}
 }
 
@@ -37,16 +37,11 @@ var tokenCallback = function(err, data) {
 		console.log(data);
 	
 		aws_api.update(data['Credentials']);
-		
-		var buff = new Buffer("BIM ALLER", 'utf8');
-		aws_api.putObject({ Bucket: 'hpc.bucket.demo', Key: 'demo/demo_last', Body: buff}, putCallback);
-
-		aws_api.getObject({ Bucket: 'hpc.bucket.demo', Key: 'demo/demo_test' }, getCallback);
-		aws_api.getObject({ Bucket: 'hpc.bucket.demo', Key: 'demo/demo_file', Range: 'bytes=3-6' }, getCallback);
+		aws_api.pushMessage({ QueueUrl: queue, MessageBody: "Test Message" }, pushCallback);
 	}
 }
 
-aws_api.getPolicy({Policy: policy, Folder: folder}, function(params) {
+aws_api.getPolicy({Policy: queue}, function(params) {
 	console.log(params);
 	aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: params['Policy']}, tokenCallback);
 });
