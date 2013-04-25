@@ -18,7 +18,7 @@ aws_api = {
 	},
 	
 	getObject : function (params, callback) {
-		this.update({region : 'us-west-1'});
+		this.update({region : 'us-east-1'});
 		var s3 = new this.handle.S3();
 		
 		s3.client.getObject(params, function(err, data) {
