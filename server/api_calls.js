@@ -1,6 +1,6 @@
 aws_api = {
-	policyFile : "./policy.json"
 	handle : require('aws-sdk'),
+	policyFile : "./policy.json",
 	akid : process.env.SWS_AKID,
 	secret : process.env.SWS_SECRET,
 	token : "",
@@ -45,7 +45,7 @@ aws_api = {
 			}
 		});
 	},
-	
+
 	addUserToGroup : function (groupName, userName, callback) {
 		this.update({region : 'us-east-1'});
 		var svc = new this.handle.IAM();
