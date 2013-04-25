@@ -25,7 +25,7 @@ var pushCallback = function(err, data) {
 	} else {
 		console.log('Success!');
 		console.log(data);
-		aws_api.popMessage({ QueueUrl: queue, MaxNumberOfMessages: 1 }, pushCallback);
+		aws_api.popMessage({ QueueUrl: queue, MaxNumberOfMessages: 1 }, popCallback);
 	}
 }
 
