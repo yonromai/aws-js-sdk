@@ -36,6 +36,7 @@ aws_api = {
 			if (err) {
 				console.log('Error while reading the policy file: ' + err);
 			} else {
+				console.log(data);
 				params['Policy'] = data[params['Policy']];
 				console.log(params);
 				
