@@ -99,4 +99,4 @@ var main = function(){
   split_matrix();
 }
 
-// main();
+main();
