@@ -36,7 +36,9 @@ aws_api = {
 	pushMessage : function(params, callback) {
 		this.update({region: 'us-east-1'});
 		var sqs = this.handle.SQS();
-
+		
+		console.log(callback);
+		
 		params['QueueUrl'] = this.queueURL[params['QueueUrl']];
 		sqs.client.sendMessage(params, function(err, data) {
 			callback(err, data);
