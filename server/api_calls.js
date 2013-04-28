@@ -106,18 +106,30 @@ exports.aws_api = {
 
 	getClientCredentials : function(callback) {
 		var clientName = 'client' + this.nb_clients;
-		this.getPolicy({
-			PolicyS3: ['ClientFolder','AllS3'],
-			PolicySQS: ['JobQueue','CallbackQueue'],
-			Folder: 'demo/clients/' + clientName + '/*'
-		}, function(err, data) {
+		this.nb_clients++;
+		obj = this;
+
+		var getCallback = function(err, data) {
 			if (err) {
 				callback(err,data);
 			} else {
-				this.nb_clients++;
-				this.getClientToken({Name: clientName, DurationSeconds: 3600, Policy: data['Policy']}, callback);
+				obj.getClientToken({Name: clientName, DurationSeconds: 3600, Policy: data['Policy']}, callback);
 			}
-		});
+		}
+
+		var putCallback = function(err, data) {
+			if (err) {
+				callback(err,data);
+			} else {
+				obj.getPolicy({
+					PolicyS3: ['ClientFolder','AllS3'],
+					PolicySQS: ['JobQueue','CallbackQueue'],
+					Folder: 'demo/clients/' + clientName + '/*'
+				}, getCallback);
+			}
+		}
+
+		this.putObject({ Key: 'demo/clients/' + clientName + '/' }, putCallback);
 	},
 	
 	getClientToken : function (params, callback) {
@@ -152,7 +164,9 @@ exports.aws_api = {
 			delete params['Folder'];
 		}
 		params['Policy'] = JSON.stringify(policy);
+		
+		console.log(params);
 		callback(null, params);
-	},
+	}
 }
 
