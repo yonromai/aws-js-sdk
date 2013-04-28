@@ -4,7 +4,12 @@ exports.aws_api = {
 	secret : process.env.SWS_SECRET,
 	token : "",
 	region : 'us-west-2',
-	policyFiles : { AllS3: "./allS3.json", ClientFolder: "./clientFolder.json", CallbackQueue: "./callback.json", JobQueue: "./jobs.json"},
+	policies : {
+		AllS3: {"Action":["s3:GetObject"],"Effect":"Allow","Resource":"*"}, 
+		ClientFolder: {"Action":["s3:GetObject", "s3:PutObject"],"Effect":"Allow","Resource":""},
+		CallbackQueue: {"Action":["sqs:sendMessage","sqs:deleteMessage"],"Effect":"Allow","Resource":"arn:aws:sqs:us-west-2:313384926431:Callback"},
+		JobQueue: {"Action":["sqs:receiveMessage","sqs:sendMessage","sqs:deleteMessage"],"Effect":"Allow","Resource":"arn:aws:sqs:us-west-2:313384926431:Job"}
+	},
 	queueURL : { JobQueue: "https://sqs.us-west-2.amazonaws.com/313384926431/Job", CallbackQueue: "https://sqs.us-west-2.amazonaws.com/313384926431/Callback" },
 	bucket : 'hpc.bucket.demo',
 
@@ -100,32 +105,37 @@ exports.aws_api = {
 	
 	getClientToken : function (params, callback) {
 		this.update({region: 'us-east-1'});
-    	var svc = new this.handle.STS();
+    	var sts = new this.handle.STS();
 		
-		svc.client.getFederationToken(params, callback);
+		sts.client.getFederationToken(params, callback);
 	},
 
 	getPolicy : function(params, callback) {
-		var fs = require('fs');
-		
-		fs.readFile(this.policyFiles[params['Policy']], 'utf8', function(err, data) {
-			if (err) {
-				console.log('Error while reading the policy file: ' + err);
-			} else {
-				var policy = data;
-				if (params['Policy'] == 'ClientFolder') {
-					var json = JSON.parse(policy);
-					json['Statement'][0]['Resource'] = "arn:aws:s3:::" + this.bucket + "/" + params['Folder'];
-					policy = JSON.stringify(json);
+		var policy = {'Statement' : []};
+		if ('PolicyS3' in params) {
+			for (var i = 0; i < params['PolicyS3'].length; i++) {
+				var to_add = this.policies[params['PolicyS3'][i]];
+				if (params['PolicyS3'][i] == 'ClientFolder') {
+					to_add['Resource'] = "arn:aws:s3:::" + this.bucket + "/" + params['Folder'];
 				}
-				if ('Folder' in params) {
-					delete params['Folder'];
-				}
-
-				params['Policy'] = policy;
-				callback(err, params);
+				policy['Statement'].push(to_add);
 			}
-		});
+			delete params['PolicyS3'];
+		}
+
+		if ('PolicySQS' in params) {
+			for (var i = 0; i < params['PolicySQS'].length; i++) {
+				var to_add = this.policies[params['PolicySQS'][i]];
+				policy['Statement'].push(to_add);
+			}
+			delete params['PolicySQS'];
+		}
+
+		if ('Folder' in params) {
+			delete params['Folder'];
+		}
+		params['Policy'] = JSON.stringify(policy);
+		callback(null, params);
 	},
 }
 

@@ -53,7 +53,7 @@ var tokenCallback = function(err, data) {
 	}
 }
 
-aws_api.getPolicy({Policy: aws_api.queue}, function(err, params) {
+aws_api.getPolicy({PolicySQS: [aws_api.queue]}, function(err, params) {
 	// console.log(params);
 	aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: params['Policy']}, tokenCallback);
 });

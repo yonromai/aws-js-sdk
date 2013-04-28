@@ -46,7 +46,7 @@ var tokenCallback = function(err, data) {
 	}
 }
 
-aws_api.getPolicy({Policy: policy, Folder: folder}, function(err, params) {
+aws_api.getPolicy({PolicyS3: [policy], PolicySQS: ['JobQueue','CallbackQueue'], Folder: folder}, function(err, params) {
 	console.log(params);
 	aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: params['Policy']}, tokenCallback);
 });
