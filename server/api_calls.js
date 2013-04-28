@@ -128,7 +128,7 @@ exports.aws_api = {
 				}, getCallback);
 			}
 		}
-
+		console.log(this);
 		this.putObject({ Key: 'demo/clients/' + clientName + '/' }, putCallback);
 	},
 	
