@@ -12,6 +12,7 @@ exports.aws_api = {
 	},
 	queueURL : { JobQueue: "https://sqs.us-west-2.amazonaws.com/313384926431/Job", CallbackQueue: "https://sqs.us-west-2.amazonaws.com/313384926431/Callback" },
 	bucket : 'hpc.bucket.demo',
+	nb_clients : 0,
 
 	// Needed params: None
 	// Accepted params: AccessKeyId, SecretAccessKey, region, SessionToken
@@ -101,6 +102,22 @@ exports.aws_api = {
 
 		params['QueueUrl'] = this.queueURL[params['QueueUrl']];
 		sqs.client.deleteMessage(params, callback);
+	},
+
+	getClientCredentials : function(callback) {
+		var clientName = 'client' + this.nb_clients;
+		this.getPolicy({
+			PolicyS3: ['ClientFolder','AllS3'],
+			PolicySQS: ['JobQueue','CallbackQueue'],
+			Folder: 'demo/clients/' + clientName + '/*'
+		}, function(err, data) {
+			if (err) {
+				callback(err,data);
+			} else {
+				this.nb_clients++;
+				this.getClientToken({Name: clientName, DurationSeconds: 3600, Policy: data['Policy']}, callback);
+			}
+		});
 	},
 	
 	getClientToken : function (params, callback) {
