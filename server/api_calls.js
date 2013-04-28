@@ -174,3 +174,42 @@ exports.getPolicy = function(params, callback) {
 	callback(null, params);
 };
 
+exports.flushBucket = function(callback) {
+	exports.update({region: 'us-east-1'});
+	var s3 = new api_object.handle.S3();
+
+	var listCallback = function(err, data) {
+		if (err) {
+			console.log(err);
+		} else {
+			var keyArray = [];
+			for (var i = 0; i < data['Contents'].length; i++) {
+				keyArray.push({Key: data['Contents'][i]['Key']});
+			}
+
+			if (data['IsTruncated']) {
+				s3.client.deleteObjects({Bucket: api_object.bucket, Delete: {Objects: keyArray}}, function(err, data) {
+					if (err) {
+						callback(err, data);
+					} else {
+						s3.client.listObjects({Bucket: api_object.bucket}, listCallback);
+					}
+				});
+			} else {
+				s3.client.deleteObjects({Bucket: api_object.bucket, Delete: {Objects: keyArray}}, callback);
+			}
+		}
+	}
+	s3.client.listObjects({Bucket: api_object.bucket}, listCallback);
+}
+
+exports.deleteObject = function(params, callback) {
+	exports.update({region: 'us-east-1'});
+	var s3 = new api_object.handle.S3();
+	
+	if (!('Bucket' in params)) {
+		params['Bucket'] = api_object.bucket;
+	}
+	s3.client.deleteObject(params, callback);
+}
+
