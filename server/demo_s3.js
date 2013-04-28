@@ -39,14 +39,22 @@ var tokenCallback = function(err, data) {
 		aws_api.update(data['Credentials']);
 		
 		var buff = new Buffer("BIM ALLER", 'utf8');
-		aws_api.putObject({ Key: 'demo/test1', Body: buff}, putCallback);
+		aws_api.putObject({ Key: 'demo/test/'}, putCallback);
 
 		aws_api.getObject({ Key: 'demo/demo_test' }, getCallback);
 		aws_api.getObject({ Key: 'demo/demo_file', Range: 'bytes=3-6' }, getCallback);
 	}
 }
 
-aws_api.getPolicy({PolicyS3: [policy], PolicySQS: ['JobQueue','CallbackQueue'], Folder: folder}, function(err, params) {
-	console.log(params);
-	aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: params['Policy']}, tokenCallback);
+// aws_api.getPolicy({PolicyS3: [policy], PolicySQS: ['JobQueue','CallbackQueue'], Folder: folder}, function(err, params) {
+// 	console.log(params);
+// 	aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: params['Policy']}, tokenCallback);
+// });
+
+aws_api.getClientCredentials(function(err, data) {
+	if (err) {
+		console.log(err);
+	} else {
+		console.log(data);
+	}
 });
