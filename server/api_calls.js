@@ -105,9 +105,9 @@ exports.aws_api = {
 	},
 
 	getClientCredentials : function(callback) {
-		var clientName = 'client' + this.nb_clients;
-		this.nb_clients++;
-		obj = this;
+		var obj = this;
+		var clientName = 'client' + obj.nb_clients;
+		obj.nb_clients++;
 
 		var getCallback = function(err, data) {
 			if (err) {
@@ -128,8 +128,8 @@ exports.aws_api = {
 				}, getCallback);
 			}
 		}
-		console.log(this);
-		this.putObject({ Key: 'demo/clients/' + clientName + '/' }, putCallback);
+		console.log(obj);
+		obj.putObject({ Key: 'demo/clients/' + clientName + '/' }, putCallback);
 	},
 	
 	getClientToken : function (params, callback) {
