@@ -110,11 +110,15 @@ exports.getClientCredentials = function(callback) {
 	var clientName = 'client' + api_object.nb_clients;
 	api_object.nb_clients++;
 
+	var finalCallback = function(err, data) {
+		callback(err, {Credentials: data['Credentials'], Folder: 'demo/clients/' + clientName + '/'});
+	}
+
 	var getCallback = function(err, data) {
 		if (err) {
 			callback(err,data);
 		} else {
-			exports.getClientToken({Name: clientName, DurationSeconds: 3600, Policy: data['Policy']}, callback);
+			exports.getClientToken({Name: clientName, DurationSeconds: 3600, Policy: data['Policy']}, finalCallback);
 		}
 	}
 
