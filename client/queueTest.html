@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<!-- <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
+<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/components/core-min.js"></script>
+<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-utf16-min.js"></script>
+<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-base64-min.js"></script>
+<script type="text/javascript" src=""http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js></script>
+<script type="text/javascript" src="aws-sqs.js"></script> -->
+<script type="text/javascript">
+document.domain = "mooo.com";
+console.log(document.domain);
+var w = new Worker("worker.js");
+w.onmessage = function (msg) {
+	console.log(msg.data);
+};
+//var client = new Client();
+//client.getCredentials(function (credentials) {
+//
+//});
+</script>
+</head>
+<body>
+Test
+</body>
+</html>
