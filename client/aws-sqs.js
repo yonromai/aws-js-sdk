@@ -49,10 +49,10 @@ Client.prototype.dequeue = function(callback) {
 	//"&Expires=" 2008-02-10T12%3A00%3A00Z" +
 	"&SignatureVersion=2" +
 	"&SignatureMethod=HmacSHA256" +
-	"&AWSAccessKeyId=" + credentials.AccessKeyId;
+	"&AWSAccessKeyId=" + this.credentials.AccessKeyId;
 	
 	var signature = encodeURIComponent(CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256( 
-    CryptoJS.enc.Utf8.parse(encodeURI(uri)), credentials.SecretAccessKey)));
+    CryptoJS.enc.Utf8.parse(encodeURI(uri)), this.credentials.SecretAccessKey)));
 	
 	uri += "&Signature=" + signature;
 	
