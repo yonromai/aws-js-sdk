@@ -43,7 +43,7 @@ Client.prototype.getCredentials = function(callback) {
 
 Client.prototype.dequeue = function(callback) {
 	print("dequeuing");
-	var uri = "http://divup.mooo.com/Callback" +
+	var uri = "http://divupsqs.mooo.com/Callback" +
 	"?Action=ReceiveMessage" +
 	//"&Attribute.Name=VisibilityTimeout" +
 	//"&Attribute.Value=90" +
