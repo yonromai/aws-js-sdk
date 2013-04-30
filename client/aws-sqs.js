@@ -29,7 +29,7 @@ Client.prototype.getCredentials = function(callback) {
 			print("Status: " + xhr.status);
 			print(typeof(xhr.response));
 			if (xhr.status == 200) {
-				self.credentials = JSON.parse(xhr.responseText);
+				self.credentials = JSON.parse(xhr.responseText).Credentials;
 				print(xhr.responseText);
 				print("credentials received");
 				if(callback) {
