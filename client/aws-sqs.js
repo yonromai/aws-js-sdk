@@ -52,6 +52,7 @@ Client.prototype.dequeue = function(callback) {
 	"&SignatureMethod=HmacSHA256" +
 	"&AWSAccessKeyId=" + this.credentials.AccessKeyId;
 	
+	print(uri);
 	var signature = encodeURIComponent(CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256( 
     CryptoJS.enc.Utf8.parse(encodeURI(uri)), this.credentials.SecretAccessKey)));
 	
