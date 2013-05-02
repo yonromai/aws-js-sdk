@@ -1,0 +1,101 @@
+<!TYPEDOC HTML>
+<html>
+<head>
+<style type="text/css">
+document {
+	font-family: monospace;
+}
+</style>
+<script type='text/javascript'>
+console.log("start");
+
+function vectorBlockMultiply(inputs, params) {
+	
+	var matrix = new Float64Array(inputs[0]); //matrixBlock
+	var vector = new Float64Array(inputs[1]); //vectorSeg
+	
+	var buffer = new ArrayBuffer(params.n * 8);
+	var result = new Float64Array(buffer);
+
+	for(var i = 0; i < params.n; i++) {
+		var row = i*params.m;
+		for(var j = 0; j < params.m; j++) {
+			result[i] += matrix[row + j] * vector[j];
+		}
+	}
+	return [buffer];
+}
+
+/*function vectorReduce(inputs, params) {
+	var v1 = new Float64Array(inputs[0]);
+	var v2 = new Float64Array(inputs[1]);
+	
+	for(var i = 0; i < params.n; i++) {
+		v1[i] += v2[i];
+	}
+	return [inputs[0]];
+}*/
+
+var size = Math.pow(2,20);
+
+console.log("Size: " + size*8/Math.pow(2,20) + " MB");
+
+var a = new ArrayBuffer(8*size);
+var m = new Float64Array(a);
+for(i = 0; i < m.length; i++) {
+	m[i] = Math.random()*1000-500;
+}
+var n = Math.sqrt(size);
+console.log("n: " + n);
+var b = new ArrayBuffer(8*n);
+var v = new Float64Array(b);
+for(i = 0; i < v.length; i++) {
+	v[i] = Math.random()*1000-500;
+}
+
+var now = new Date().getTime();
+var result = vectorBlockMultiply([a, b], {n:n, m:n});
+var time = new Date().getTime() - now;
+console.log("Time: " + time + "ms");
+
+/*
+// This following is for printing the values
+var str = "";
+console.log("Vector:");
+for(i = 0; i < n; i++) {
+	str += v[i] + " ";
+}
+console.log(str);
+str = "";
+console.log("Matrix:");
+for(i = 0; i < n*n; i++) {
+	str += m[i] + " ";
+	if((i + 1) % n == 0) {
+		str += "\n";
+	}
+}
+console.log(str);
+
+var str = "";
+console.log("Result:");
+var r = new Float64Array(result[0]);
+for(i = 0; i < r.length; i++) {
+	str += r[i] + " ";
+}
+console.log(str);
+*/
+
+
+</script>
+</head>
+
+<body>
+<p style="font-family: monospace">
+<script type="text/javascript">
+document.write("Size: " + size*8/Math.pow(2,20) + " MB<br/>");
+document.write("&nbsp;&nbsp;&nbsp;N:    " + n + "<br/>");
+document.write("Time: " + time + "ms");
+</script>
+</p>
+</body>
+</html>
