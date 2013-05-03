@@ -5,7 +5,7 @@ if (process.argv.length < 4) {
 	process.exit();
 }
 
-var aws_api = require('./api_calls.js').aws_api;
+var aws_api = require('./api_calls.js');
 
 var userName = process.argv[2];
 var policy = process.argv[3];
@@ -51,7 +51,15 @@ var tokenCallback = function(err, data) {
 // 	aws_api.getClientToken({Name: userName, DurationSeconds: 3600, Policy: params['Policy']}, tokenCallback);
 // });
 
-aws_api.getClientCredentials(function(err, data) {
+/* aws_api.getClientCredentials(function(err, data) {
+	if (err) {
+		console.log(err);
+	} else {
+		console.log(data);
+	}
+}); */
+
+aws_api.flushBucket(function(err, data) {
 	if (err) {
 		console.log(err);
 	} else {

@@ -1,0 +1,7 @@
+false
+{ [MalformedXML: The XML you provided was not well-formed or did not validate against our published schema]
+  message: 'The XML you provided was not well-formed or did not validate against our published schema',
+  code: 'MalformedXML',
+  name: 'MalformedXML',
+  statusCode: 400,
+  retryable: false }

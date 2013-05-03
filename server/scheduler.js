@@ -1,8 +1,13 @@
 var math = require('mathjs');
-var aws_api = require('./api_calls.js').aws_api;
+var aws_api = require('./api_calls.js');
 var n_chunk_size = 50, m_chunk_size = 20 
 
-var split_matrix = function(){
+var split_matrix = function(err, data){
+  if (err) {
+    console.log(err);
+    return;
+  }
+
   var mat = require("./create_matrix").createMatrix();
   var vec = require("./create_matrix").createVector();
   var n = mat._size[0],
@@ -11,6 +16,7 @@ var split_matrix = function(){
   // Uploading vect chunks into S3
   vec_chunks = [];
   vec_cnt = m;
+
   for (var i = 0;; ++i){
     vec_chunks.push({});
     vec_chunks[i].size = math.min(vec_cnt, m_chunk_size);
@@ -69,9 +75,9 @@ var split_matrix = function(){
       // TODO: post s3_msg on S3
       aws_api.putObject({Key: 'next_jobs/' + s3_msg_id, Table: s3_msg}, function(err, data) {
         if (err) {
-          console.log('Error while sending message.');
+          console.log('Error while putting object.');
         } else {
-          console.log('Message sent.')
+          console.log('Object put.')
         }
       });
 
@@ -85,7 +91,7 @@ var split_matrix = function(){
         "input_blob": [mat_chunks[i][j].path, vec_chunks[mat_chunks[i][j].related_vec_chunk].path]
       };
       // TODO: Post the message on the queue
-      aws_api.pushMessage({QueueUrl: 'JobQueue', MessageTable: job_msg}, function(err, data) {
+      aws_api.pushJobQueue({MessageTable: job_msg}, function(err, data) {
         if (err) {
           console.log('Error while pushing message on the Job Queue.');
         } else {
@@ -96,7 +102,7 @@ var split_matrix = function(){
 }
 
 var main = function(){
-  split_matrix();
+  aws_api.flushAll(split_matrix);
 }
 
 main();

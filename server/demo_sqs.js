@@ -5,7 +5,7 @@ if (process.argv.length < 4) {
 	process.exit();
 }
 
-var aws_api = require('./api_calls.js').aws_api;
+var aws_api = require('./api_calls.js')
 
 var userName = process.argv[2];
 aws_api.queue = process.argv[3];
@@ -38,7 +38,7 @@ var pushCallback = function(err, data) {
 	} else {
 		console.log('Success Push!');
 		console.log(data);
-		aws_api.peekMessage({ QueueUrl: aws_api.queue, MaxNumberOfMessages: 1 }, peekCallback);
+		// aws_api.peekMessage({ QueueUrl: aws_api.queue, MaxNumberOfMessages: 1 }, peekCallback);
 	}
 }
 
@@ -49,7 +49,9 @@ var tokenCallback = function(err, data) {
 		console.log('Success Policy!');
 		aws_api.update(data['Credentials']);
 
-		aws_api.pushMessage({ QueueUrl: aws_api.queue, MessageTable: {'test':'message'} }, pushCallback);
+		//aws_api.peekJobQueue(peekCallback);
+		//aws_api.peekCallbackQueue(peekCallback);
+		//aws_api.removeJobQueue('uUk89DYFzt1VAHtMW2iz0UyGpM8guQqwZ2f/8xfP2FI9yTikLc/LbV3ByJMhJwJ+Jqy5Zc8kH4LNz3fSIxqYdfG7lYG8peE1IHpo/F2tZbShFSibqq3ngfUdyvzXq6mhoay2L/MA+TmnhIXkATO1WXBWDwztBbWdVoL6na4U/BFw2FJRm1PjskhDkZhU/9Iqiq7bJDoJe1dspADAFcWL3+wV0n8TK0trYGXRQEzMrmeknV3AQyPB5vF4rethYgdX5SIgXC7bSvjC+dMElIkU8ldiArD+v14vHSntNcbV/IM=', rmCallback);
 	}
 }
 

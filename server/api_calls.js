@@ -8,7 +8,7 @@ var api_object = {
 	policies : {
 		AllS3: {"Action":["s3:GetObject"],"Effect":"Allow","Resource":"*"}, 
 		ClientFolder: {"Action":["s3:GetObject", "s3:PutObject"],"Effect":"Allow","Resource":""},
-		CallbackQueue: {"Action":["sqs:sendMessage","sqs:deleteMessage"],"Effect":"Allow","Resource":"arn:aws:sqs:us-west-2:313384926431:Callback"},
+		CallbackQueue: {"Action":["sqs:sendMessage"],"Effect":"Allow","Resource":"arn:aws:sqs:us-west-2:313384926431:Callback"},
 		JobQueue: {"Action":["sqs:receiveMessage","sqs:sendMessage","sqs:deleteMessage"],"Effect":"Allow","Resource":"arn:aws:sqs:us-west-2:313384926431:Job"}
 	},
 	queueURL : { JobQueue: "https://sqs.us-west-2.amazonaws.com/313384926431/Job", CallbackQueue: "https://sqs.us-west-2.amazonaws.com/313384926431/Callback" },
@@ -73,6 +73,16 @@ exports.pushMessage = function(params, callback) {
 	sqs.client.sendMessage(params, callback);
 };
 
+exports.pushJobQueue = function(params, callback) {
+	params['QueueUrl'] = 'JobQueue';
+	exports.pushMessage(params, callback);
+};
+
+exports.pushCallbackQueue = function(params, callback) {
+	params['QueueUrl'] = 'CallbackQueue';
+	exports.pushMessage(params, callback);
+};
+
 exports.pushMessageBatch = function(params, callback) {
 	update({region: 'us-east-1'});
 	var sqs = new api_object.handle.SQS();
@@ -83,12 +93,21 @@ exports.pushMessageBatch = function(params, callback) {
 
 // Needed Params: QueueUrl, MaxNumberOfMessages
 // Accepted Params: None
+// the returned data contains "ReceiptHandle" and "Body" that are useful
 exports.peekMessage = function(params, callback) {
 	exports.update({region: 'us-east-1'});
 	var sqs = new api_object.handle.SQS();
 
 	params['QueueUrl'] = api_object.queueURL[params['QueueUrl']];
 	sqs.client.receiveMessage(params, callback);
+};
+
+exports.peekJobQueue = function(callback) {
+	exports.peekMessage({QueueUrl: 'JobQueue'}, callback);
+};
+
+exports.peekCallbackQueue = function(callback) {
+	exports.peekMessage({QueueUrl: 'CallbackQueue'}, callback);
 };
 
 // Needed Params: QueueUrl
@@ -104,6 +123,20 @@ exports.removeMessage = function(params, callback) {
 
 	params['QueueUrl'] = api_object.queueURL[params['QueueUrl']];
 	sqs.client.deleteMessage(params, callback);
+};
+
+exports.removeJobQueue = function(msgHandle, callback) {
+	var params = new Array();
+	params['ReceiptHandle'] = msgHandle;
+	params['QueueUrl'] = 'JobQueue';
+	exports.removeMessage(params, callback);
+};
+
+exports.removeCallbackQueue = function(msgHandle, callback) {
+	var params = new Array();
+	params['ReceiptHandle'] = msgHandle;
+	params['QueueUrl'] = 'CallbackQueue';
+	exports.removeMessage(params, callback);
 };
 
 exports.getClientCredentials = function(callback) {
@@ -201,6 +234,47 @@ exports.flushBucket = function(callback) {
 		}
 	}
 	s3.client.listObjects({Bucket: api_object.bucket}, listCallback);
+}
+
+exports.flushQueue = function(queue, callback) {
+	exports.update({region: 'us-east-1'});
+	var sqs = new api_object.handle.SQS();
+
+	var flush = function(err, data) {
+		if (err) {
+			console.log(err);
+		} else {
+			sqs.client.receiveMessage({QueueUrl: api_object.queueURL[queue], MaxNumberOfMessages: 10}, function(err, data) {
+				if (err) {
+					console.log(err);
+				} else {
+					if ('Messages' in data) {
+						var msgArray = [];
+						for (var i = 0; i < data['Messages'].length; i++) {
+							msgArray.push({Id: data['Messages'][i]['MessageId'], ReceiptHandle: data['Messages'][i]['ReceiptHandle']});
+						}
+
+						var params = new Array();
+						params['Entries'] = msgArray;
+						params['QueueUrl'] = api_object.queueURL[queue];
+						sqs.client.deleteMessageBatch(params, flush);
+					} else {
+						callback(err, data);
+					}
+				}
+			});
+		}
+	}
+
+	flush(null, null);
+};
+
+exports.flushAll = function(callback) {
+	exports.flushQueue('JobQueue', function(err, data) {
+		exports.flushQueue('CallbackQueue', function(err, data) {
+			exports.flushBucket(callback);
+		});
+	});
 }
 
 exports.deleteObject = function(params, callback) {
